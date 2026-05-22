@@ -31,6 +31,19 @@ public class Product implements EntityInterface {
     @Column(name = "date_price")
     private Date datePrice;
 
+    @Column(name = "store_name")
+    private String storeName;
+
+    @Column(name = "best_product_url", length = 1000)
+    private String bestProductUrl;
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private List<ProductLink> links = new ArrayList<>();
+
     @OneToMany(
             mappedBy = "product",
             cascade = CascadeType.ALL,
@@ -75,14 +88,40 @@ public class Product implements EntityInterface {
     }
 
     public void setPrice(Float price) {
+        setPrice(price, null, null);
+    }
+
+    public void setPrice(Float price, String storeName) {
+        setPrice(price, storeName, null);
+    }
+
+    public void setPrice(Float price, String storeName, String bestProductUrl) {
         if (this.price != null && this.datePrice != null) {
-            Price oldPrice = new Price(this.price, this.datePrice);
+            Price oldPrice = new Price(this.price, this.datePrice, this.storeName, this.bestProductUrl);
             oldPrice.setProduct(this);
             historicalPrice.add(oldPrice);
         }
 
         this.price = price;
+        this.storeName = storeName;
+        this.bestProductUrl = bestProductUrl;
         this.datePrice = new Date();
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public String getBestProductUrl() {
+        return bestProductUrl;
+    }
+
+    public void setBestProductUrl(String bestProductUrl) {
+        this.bestProductUrl = bestProductUrl;
     }
 
     public Date getDatePrice() {
@@ -101,6 +140,14 @@ public class Product implements EntityInterface {
         this.historicalPrice = historicalPrice;
     }
 
+    public List<ProductLink> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<ProductLink> links) {
+        this.links = links;
+    }
+
     @Override
     public UUID getUUID() {
         return this.uuid;
@@ -109,12 +156,15 @@ public class Product implements EntityInterface {
     @Override
     public String toString() {
         return "Product{" +
-                "UUID='" + uuid.toString() +'\'' +
+                "UUID='" + uuid.toString() + '\'' +
                 "Sku='" + sku + '\'' +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", datePrice=" + datePrice +
+                ", storeName='" + storeName + '\'' +
+                ", bestProductUrl='" + bestProductUrl + '\'' +
                 ", historicalPrice=" + historicalPrice +
+                ", links=" + links.size() +
                 '}';
     }
 }

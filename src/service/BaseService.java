@@ -32,7 +32,7 @@ public abstract class BaseService implements ServiceInterface {
     public void listAll() {
         ArrayList<EntityInterface> dados = armazenamento.listAll();
         for (int i = 0; i < dados.size(); i++) {
-            IO.println(dados.get(i));
+            System.out.println(dados.get(i));
         }
     }
 
